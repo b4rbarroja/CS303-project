@@ -9,6 +9,7 @@ export default function BookCard({
   image,
   imageUrl,
   genre,
+  rating,
   status,
   availableCopies,
   totalCopies,
@@ -19,6 +20,7 @@ export default function BookCard({
   const total = Number.isFinite(Number(totalCopies)) ? Number(totalCopies) : stock;
   const isAvailable = stock > 0;
   const label = status || (isAvailable ? 'Available' : 'Unavailable');
+  const displayRating = Number.isFinite(Number(rating)) ? Math.min(5, Math.max(0, Math.round(Number(rating)))) : 0;
 
   return (
     <TouchableOpacity
@@ -46,6 +48,17 @@ export default function BookCard({
 
       <View style={styles.info}>
         <Text style={styles.title} numberOfLines={2}>{title || 'Unknown Title'}</Text>
+
+        <View style={styles.ratingContainer}>
+          {Array.from({ length: 5 }, (_, i) => (
+            <MaterialCommunityIcons
+              key={i}
+              name={i < displayRating ? 'star' : 'star-outline'}
+              size={14}
+              color={COLORS.brand.primary}
+            />
+          ))}
+        </View>
 
         <View style={styles.authorContainer}>
           <MaterialCommunityIcons name="account" size={14} color={COLORS.neutral[500]} />
@@ -166,5 +179,11 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: 0.4,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 2,
   },
 });

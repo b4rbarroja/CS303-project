@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { recordBorrowBook } from '../store/slices/borrowSlice';
 import {
@@ -24,6 +25,7 @@ export default function BookDetailsScreen({ route, navigation }) {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { userBorrowedBooks = [] } = useSelector((state) => state.borrow);
   const [borrowing, setBorrowing] = useState(false);
+  const [userRating, setUserRating] = useState(0); //change this to save user's rating for the book after implementing the rating feature in the backend
 
   const incomingBook = route?.params?.book;
   const book = useMemo(() => normalizeBook(incomingBook || {}), [incomingBook]);
@@ -178,6 +180,39 @@ export default function BookDetailsScreen({ route, navigation }) {
           <Text style={styles.bookTitle}>{book.title}</Text>
           <Text style={styles.bookAuthor}>by {book.author || 'Unknown Author'}</Text>
 
+          <View style={styles.ratingSection}>
+            <Text style={styles.ratingLabel}>Rating</Text>
+            <View style={styles.ratingDisplay}>
+              {Array.from({ length: 5 }, (_, i) => (
+                <MaterialCommunityIcons
+                  key={i}
+                  name={i < (book.rating || 0) ? 'star' : 'star-outline'}
+                  size={24}
+                  color={COLORS.brand.primary}
+                />
+              ))}
+              <Text style={styles.ratingText}>{book.rating ? `${book.rating}/5` : 'Not rated'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.ratingSection}>
+            <Text style={styles.ratingLabel}>Rate this book</Text>
+            <View style={styles.ratingInput}>
+              {Array.from({ length: 5 }, (_, i) => (
+                <TouchableOpacity key={i} onPress={() => setUserRating(i + 1)}>
+                  <MaterialCommunityIcons
+                    name={i < userRating ? 'star' : 'star-outline'}
+                    size={32}
+                    color={COLORS.brand.primary}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
+            {userRating > 0 && (
+              <Text style={styles.userRatingText}>You rated: {userRating}/5</Text>
+            )}
+          </View>
+
           <View style={styles.metaGrid}>
             <View style={styles.metaItem}>
               <Text style={styles.metaLabel}>Genre</Text>
@@ -310,6 +345,35 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.md,
     marginTop: SPACING.xs,
     marginBottom: SPACING.lg,
+  },
+  ratingSection: {
+    marginBottom: SPACING.lg,
+  },
+  ratingLabel: {
+    color: COLORS.text.primary,
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: TYPOGRAPHY.weights.medium,
+    marginBottom: SPACING.sm,
+  },
+  ratingDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  ratingText: {
+    color: COLORS.text.secondary,
+    fontSize: TYPOGRAPHY.sizes.sm,
+    marginLeft: SPACING.xs,
+  },
+  ratingInput: {
+    flexDirection: 'row',
+    gap: SPACING.xs,
+  },
+  userRatingText: {
+    color: COLORS.brand.primary,
+    fontSize: TYPOGRAPHY.sizes.sm,
+    marginTop: SPACING.xs,
+    fontWeight: TYPOGRAPHY.weights.medium,
   },
   metaGrid: {
     flexDirection: 'row',
