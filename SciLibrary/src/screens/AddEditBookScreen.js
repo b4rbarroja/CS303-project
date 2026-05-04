@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { addBook, updateBook, resetBookSlice, fetchAllBooks } from '../store/books';
 import Toast from 'react-native-toast-message';
 import * as ImagePicker from 'expo-image-picker';
+import { COLORS } from '../../shared/designTokens';
 
 export default function AddEditBookScreen({ route, navigation }) {
   const bookToEdit = route.params?.book;
@@ -31,6 +33,7 @@ export default function AddEditBookScreen({ route, navigation }) {
   const [genre, setGenre] = useState('');
   const [edition, setEdition] = useState('');
   const [totalCopies, setTotalCopies] = useState('');
+  const [rating, setRating] = useState(0);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
 
@@ -41,6 +44,7 @@ export default function AddEditBookScreen({ route, navigation }) {
       setGenre(bookToEdit.genre || '');
       setEdition(bookToEdit.edition || '');
       setTotalCopies(bookToEdit.totalCopies ? bookToEdit.totalCopies.toString() : '');
+      setRating(bookToEdit.rating || 0);
       setImagePreview(bookToEdit.image?.url || '');
     }
   }, [bookToEdit]);
@@ -84,6 +88,7 @@ export default function AddEditBookScreen({ route, navigation }) {
     formData.append("genre", genre);
     formData.append("edition", edition);
     formData.append("totalCopies", parseInt(totalCopies, 10));
+    formData.append("rating", rating);
 
     if (image) {
       const localUri = image.uri;
@@ -147,6 +152,24 @@ export default function AddEditBookScreen({ route, navigation }) {
           <TextInput style={styles.input} value={totalCopies} onChangeText={setTotalCopies} placeholder="e.g. 10" keyboardType="numeric" />
         </View>
 
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Rating</Text>
+          <View style={styles.ratingInput}>
+            {Array.from({ length: 5 }, (_, i) => (
+              <TouchableOpacity key={i} onPress={() => setRating(i + 1)}>
+                <MaterialCommunityIcons
+                  name={i < rating ? 'star' : 'star-outline'}
+                  size={32}
+                  color={COLORS.brand.primary}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+          {rating > 0 && (
+            <Text style={styles.ratingText}>Rating: {rating}/5</Text>
+          )}
+        </View>
+
         <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit} disabled={loading}>
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>{isEditing ? "Update Book" : "Add Book"}</Text>}
         </TouchableOpacity>
@@ -172,6 +195,16 @@ const styles = StyleSheet.create({
   inputGroup: { marginBottom: 16 },
   label: { fontSize: 12, fontWeight: 'bold', color: '#6b7280', textTransform: 'uppercase', marginBottom: 6, marginLeft: 4 },
   input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', padding: 14, borderRadius: 12, fontSize: 15, color: '#111' },
+  ratingInput: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  ratingText: {
+    color: COLORS.brand.primary,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
   submitBtn: { backgroundColor: '#358a74', padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 10, shadowColor: '#358a74', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 4 },
   submitText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
 });

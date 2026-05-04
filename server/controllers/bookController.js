@@ -33,7 +33,7 @@ export const createBook = catchAsyncErrors(async (req, res, next) => {
     }
 
     const { image } = req.files;
-    const { title, genre, author, edition, totalCopies } = req.body;
+    const { title, genre, author, edition, totalCopies, rating } = req.body;
 
     if (!title || !genre || !author || !edition) {
         return next(new ErrorHandler("Please provide title, genre, author, and edition.", 400));
@@ -43,6 +43,12 @@ export const createBook = catchAsyncErrors(async (req, res, next) => {
     const copies = totalCopies ? parseInt(totalCopies) : 1;
     if (isNaN(copies) || copies <= 0) {
         return next(new ErrorHandler("Total copies must be a positive number.", 400));
+    }
+
+    // Validate rating
+    const bookRating = rating ? parseFloat(rating) : 0;
+    if (isNaN(bookRating) || bookRating < 0 || bookRating > 5) {
+        return next(new ErrorHandler("Rating must be a number between 0 and 5.", 400));
     }
 
     const cloudinaryResponse = await cloudinary.v2.uploader.upload(image.tempFilePath, {
@@ -61,6 +67,7 @@ export const createBook = catchAsyncErrors(async (req, res, next) => {
         status: "Available", 
         totalCopies: copies,
         availableCopies: copies,
+        rating: bookRating,
         image: {
             public_id: cloudinaryResponse.public_id,
             url: cloudinaryResponse.secure_url,
@@ -82,7 +89,7 @@ export const createBook = catchAsyncErrors(async (req, res, next) => {
 // 2. Update a Book (Admin and super admin)
 export const updateBook = catchAsyncErrors(async (req, res, next) => {
     const bookId = req.params.id;
-    const { title, genre, author, edition, totalCopies } = req.body;
+    const { title, genre, author, edition, totalCopies, rating } = req.body;
 
     const bookRef = db.collection("books").doc(bookId);
     let bookDoc = await bookRef.get();
@@ -122,6 +129,15 @@ export const updateBook = catchAsyncErrors(async (req, res, next) => {
         };
     }
 
+    // Validate rating
+    let bookRating = null;
+    if (rating !== undefined) {
+        bookRating = parseFloat(rating);
+        if (isNaN(bookRating) || bookRating < 0 || bookRating > 5) {
+            return next(new ErrorHandler("Rating must be a number between 0 and 5.", 400));
+        }
+    }
+
     // Atomic Math Update
     await db.runTransaction(async (transaction) => {
         const latestDoc = await transaction.get(bookRef);
@@ -137,6 +153,10 @@ export const updateBook = catchAsyncErrors(async (req, res, next) => {
             edition: edition || latestData.edition,
             updatedAt: new Date(),
         };
+
+        if (bookRating !== null) {
+            updateData.rating = bookRating;
+        }
 
         if (newImageData) {
             updateData.image = newImageData;
