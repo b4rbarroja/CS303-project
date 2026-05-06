@@ -18,6 +18,7 @@ import UserProfile from "./components/UserProfile";
 import BorrowRequests from "./components/BorrowRequests";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppErrorBoundary from "./components/AppErrorBoundary";
+import AiChat from "./components/AiChat";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -116,6 +117,7 @@ const App = () => {
           toastStyle={{ backgroundColor: "#358a74" }}
           rtl={false} 
         />
+        {isAuthenticated && <AiChat />}
         </div>
       </Router>
     </AppErrorBoundary>

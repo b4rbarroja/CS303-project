@@ -31,6 +31,9 @@ import StatsScreen from "../screens/StatsScreen";
 // Notification Screens
 import NotificationCenterScreen from "../screens/NotificationCenterScreen";
 
+// AI Chat Screen
+import AiChatScreen from "../screens/AiChatScreen";
+
 // Tab Navigators
 import UserTabNavigator from "./UserTabNavigator";
 import AdminTabNavigator from "./AdminTabNavigator";
@@ -79,6 +82,13 @@ const UserStack = () => (
         }}
       />
     </Stack.Group>
+
+    {/* AI Chat - full screen */}
+    <Stack.Screen
+      name="AiChat"
+      component={AiChatScreen}
+      options={{ headerShown: false }}
+    />
   </Stack.Navigator>
 );
 
@@ -94,6 +104,11 @@ const AdminStack = () => (
     <Stack.Screen name="AddNewAdmin" component={AddNewAdminScreen} />
     <Stack.Screen name="BookDetails" component={BookDetailsScreen} />
     <Stack.Screen name="MyBorrowedBooks" component={MyBorrowedBooksScreen} />
+    <Stack.Screen
+      name="AiChat"
+      component={AiChatScreen}
+      options={{ headerShown: false }}
+    />
   </Stack.Navigator>
 );
 
