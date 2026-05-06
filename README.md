@@ -18,6 +18,8 @@ NodeJs <br>
 ReactJS <br>
 bcrypt <br>
 Firestore <br>
+GroqAI api <br>
+TavilySearchAI api <br>
 
 # Project Overview
 
