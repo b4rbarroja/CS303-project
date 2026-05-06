@@ -3,11 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 import { 
   FaUser, FaLock, FaEnvelope, FaShieldAlt, 
-  FaMoneyBillWave, FaUsers, FaPlusCircle, FaCogs 
+  FaMoneyBillWave, FaUsers, FaPlusCircle, FaCogs, FaGift 
 } from "react-icons/fa";
 import { updatePassword, resetAuthSlice } from "../store/slices/authSlice";
-import { toggleAddNewAdminPopup } from "../store/slices/popUpSlice";
+import { toggleAddNewAdminPopup, toggleDonateBookPopup } from "../store/slices/popUpSlice";
 import AddNewAdmin from "../popups/AddNewAdmin";
+import DonateBookPopup from "../popups/DonateBookPopup";
 import { toast } from "react-toastify";
 
 const Settings = ({ setSelectedComponent }) => {
@@ -15,7 +16,7 @@ const Settings = ({ setSelectedComponent }) => {
   const navigateTo = useNavigate();
   
   const { user, loading, error, message, isAuthenticated } = useSelector((state) => state.auth);
-  const { AddNewAdminPopup } = useSelector((state) => state.popup);
+  const { AddNewAdminPopup, donateBookPopup } = useSelector((state) => state.popup);
 
   const [passwordData, setPasswordData] = useState({
     oldPassword: "",
@@ -237,11 +238,31 @@ const Settings = ({ setSelectedComponent }) => {
             )}
           </div>
 
+          {user?.role !== "Admin" && user?.role !== "Super Admin" && (
+          <div className="bg-amber-50 border border-amber-100 p-8 rounded-[2.5rem] flex flex-col sm:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-5">
+              <div className="p-4 bg-white text-amber-500 rounded-2xl shadow-sm border border-amber-50">
+                <FaGift size={24} />
+              </div>
+              <div>
+                <h4 className="font-black text-slate-800 uppercase tracking-tight text-lg">Donate a Book</h4>
+                <p className="text-[10px] text-amber-600 font-black uppercase tracking-widest">Share with the community</p>
+              </div>
+            </div>
+            <button
+              onClick={() => dispatch(toggleDonateBookPopup())}
+              className="bg-amber-500 text-white px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-200"
+            >
+              Donate Now
+            </button>
+          </div>
+          )}
+
         </div>
       </div>
 
-      {/* Popup */}
       {AddNewAdminPopup && <AddNewAdmin />}
+      {donateBookPopup && <DonateBookPopup />}
     </div>
   );
 };

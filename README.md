@@ -1,74 +1,41 @@
-<<<<<<< HEAD
-# CS303-project
-=======
-# Getting Started with Create React App
+# CS303-project-Team
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
 
-In the project directory, you can run:
+| # | Name | ID |
+|---|------|----|
+| 1 | Zeyad Khaled | 2327001 |
+| 2 | Abdelfattah Mostafa | 2327239 |
+| 3 | Mostafa Mahmoud | 2327323 |
+| 4 | Asmaa Edris | 2127405 |
+| 5 | Alaa Maher | 2027159 |
+| 6 | Baraa Amir | 2331059 |
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:5173) to view it in your browser.
+# Dependencies
+ExpressJS <br>
+NodeJs <br>
+ReactJS <br>
+bcrypt <br>
+Firestore <br>
+GroqAI api <br>
+TavilySearchAI api <br>
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+# Project Overview
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This repository contains a Library Management System designed to streamline library operations for both administrators and members. The system automates the core processes of managing book inventories, tracking user borrowing activities, enforcing library policies, and community contributions.
 
-### `npm run build`
+## Key Features
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### Book & Inventory Management: Easily add, update, search, and track the availability of books within the library.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### Borrowing & Returning System: A robust checkout process that tracks borrowed books, assigns due dates, and manages returns in real-time.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### Automated Fines Calculation: Automatically detects overdue books and calculates appropriate fines based on the number of delayed days, ensuring fair penalty enforcement.
 
-### `npm run eject`
+#### User Book Donations: Empowers users to actively contribute to the library's growing collection through a streamlined and easy-to-use book donation system.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+#### User Management: Distinct roles and secure dashboards for librarians (admins) and regular library members.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
->>>>>>> master
+This project serves as an efficient digital solution to replace manual library tracking, minimizing errors and improving the overall user experience.

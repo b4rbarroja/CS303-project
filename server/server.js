@@ -2,10 +2,12 @@ import { app } from "./app.js";
 import { connectDB } from "./database/db.js";
 import { startCleanupScheduler } from "./utils/cleanupUnverifiedAccounts.js";
 import { initializeOverdueCron } from "./utils/overdueCron.js";
+import { loadLibraryKnowledgeBase } from "./utils/aiCache.js";
 import cloudinary from "cloudinary";
 import os from "os";
 
 connectDB();
+loadLibraryKnowledgeBase(); // Cache all books for AI Librarian (one-time read)
 startCleanupScheduler();
 initializeOverdueCron(); // Start daily overdue detection
 

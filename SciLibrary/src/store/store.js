@@ -6,6 +6,7 @@ import borrowReducer from "./slices/borrowSlice";
 import popupReducer from "./slices/popupSlice";
 import notificationReducer from "./slices/notificationSlice";
 import fineReducer from "./slices/fineSlice";
+import donationReducer from "./slices/donationSlice";
 
 const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
         popup: popupReducer,
         notifications: notificationReducer,
         fine: fineReducer,
+        donation: donationReducer,
     },
 });
 

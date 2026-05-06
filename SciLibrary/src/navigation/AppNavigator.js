@@ -27,9 +27,14 @@ import AddEditBookScreen from "../screens/AddEditBookScreen";
 import UsersScreen from "../screens/UsersScreen";
 import AddNewAdminScreen from "../screens/AddNewAdminScreen";
 import StatsScreen from "../screens/StatsScreen";
+import DonateBookScreen from "../screens/DonateBookScreen";
+import DonationRequestsScreen from "../screens/DonationRequestsScreen";
 
 // Notification Screens
 import NotificationCenterScreen from "../screens/NotificationCenterScreen";
+
+// AI Chat Screen
+import AiChatScreen from "../screens/AiChatScreen";
 
 // Tab Navigators
 import UserTabNavigator from "./UserTabNavigator";
@@ -79,6 +84,20 @@ const UserStack = () => (
         }}
       />
     </Stack.Group>
+
+    {/* AI Chat - full screen */}
+    <Stack.Screen
+      name="AiChat"
+      component={AiChatScreen}
+      options={{ headerShown: false }}
+    />
+
+    {/* Donate Book */}
+    <Stack.Screen
+      name="DonateBook"
+      component={DonateBookScreen}
+      options={{ headerShown: false }}
+    />
   </Stack.Navigator>
 );
 
@@ -94,6 +113,13 @@ const AdminStack = () => (
     <Stack.Screen name="AddNewAdmin" component={AddNewAdminScreen} />
     <Stack.Screen name="BookDetails" component={BookDetailsScreen} />
     <Stack.Screen name="MyBorrowedBooks" component={MyBorrowedBooksScreen} />
+    <Stack.Screen name="DonateBook" component={DonateBookScreen} />
+    <Stack.Screen name="DonationRequests" component={DonationRequestsScreen} />
+    <Stack.Screen
+      name="AiChat"
+      component={AiChatScreen}
+      options={{ headerShown: false }}
+    />
   </Stack.Navigator>
 );
 

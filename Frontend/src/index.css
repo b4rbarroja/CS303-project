@@ -3,10 +3,64 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── AI Chat Theme Variables ── */
+:root {
+  --ai-primary: #358a74;
+  --ai-primary-dark: #2d7a68;
+}
+
 * {
   font-optical-sizing: auto;
   font-style: normal;
   box-sizing: border-box;
+}
+
+/* ── AI Chat Animations ── */
+@keyframes aiFabPulse {
+  0%, 100% { box-shadow: 0 8px 30px rgba(53, 138, 116, 0.4); }
+  50% { box-shadow: 0 8px 40px rgba(53, 138, 116, 0.65); }
+}
+
+.ai-fab-pulse {
+  animation: aiFabPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes aiTypingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+.ai-typing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--ai-primary);
+  display: inline-block;
+  animation: aiTypingBounce 1.2s ease-in-out infinite;
+}
+
+@keyframes aiMsgEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-msg-enter {
+  animation: aiMsgEnter 0.3s ease-out;
+}
+
+/* AI Chat scrollbar */
+.ai-chat-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.ai-chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ai-chat-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+.ai-chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 html, body {

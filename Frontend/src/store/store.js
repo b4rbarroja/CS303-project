@@ -4,6 +4,7 @@ import popupReducer from "./slices/popUpSlice";
 import bookReducer from "./slices/bookSlice";
 import userReducer from "./slices/userSlice";
 import borrowReducer from "./slices/borrowSlice";
+import donationReducer from "./slices/donationSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export const store = configureStore({
     book: bookReducer,
     user: userReducer,
     borrow: borrowReducer,
+    donation: donationReducer,
   },
 });

@@ -14,6 +14,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, getUser } from '../store/slices/authSlice';
 import api from '../api/axios';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, SPACING, BORDER_RADIUS, TYPOGRAPHY, SHADOWS } from '../../shared/designTokens';
 
 const SettingsScreen = ({ navigation }) => {
@@ -210,6 +211,44 @@ const SettingsScreen = ({ navigation }) => {
         )}
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Help & Support</Text>
+          <TouchableOpacity
+            style={styles.faqButton}
+            onPress={() => navigation.navigate('AiChat')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.faqIconCircle}>
+              <MaterialCommunityIcons name="frequently-asked-questions" size={20} color={COLORS.brand.primary} />
+            </View>
+            <View style={styles.faqTextGroup}>
+              <Text style={styles.faqTitle}>FAQ — AI Librarian</Text>
+              <Text style={styles.faqSubtitle}>Get instant answers about the library</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={22} color={COLORS.text.tertiary || COLORS.neutral[400]} />
+          </TouchableOpacity>
+        </View>
+
+        {!isAdmin && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Community</Text>
+          <TouchableOpacity
+            style={styles.faqButton}
+            onPress={() => navigation.navigate('DonateBook')}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.faqIconCircle, { backgroundColor: `${COLORS.brand.accent}15` }]}>
+              <MaterialCommunityIcons name="gift-outline" size={20} color={COLORS.brand.accent} />
+            </View>
+            <View style={styles.faqTextGroup}>
+              <Text style={styles.faqTitle}>Donate a Book</Text>
+              <Text style={styles.faqSubtitle}>Share a book with the library</Text>
+            </View>
+            <MaterialCommunityIcons name="chevron-right" size={22} color={COLORS.text.tertiary || COLORS.neutral[400]} />
+          </TouchableOpacity>
+        </View>
+        )}
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Session</Text>
           <TouchableOpacity style={styles.dangerButton} onPress={handleLogout}>
             <Text style={styles.dangerButtonText}>Sign Out</Text>
@@ -393,6 +432,35 @@ const styles = StyleSheet.create({
     color: COLORS.text.onDanger,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: TYPOGRAPHY.weights.bold,
+  },
+  faqButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.background.secondary,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.md,
+    gap: SPACING.md,
+  },
+  faqIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: `${COLORS.brand.primary}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  faqTextGroup: {
+    flex: 1,
+  },
+  faqTitle: {
+    color: COLORS.text.primary,
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+  },
+  faqSubtitle: {
+    color: COLORS.text.secondary,
+    fontSize: TYPOGRAPHY.sizes.xs,
+    marginTop: 2,
   },
   buttonDisabled: {
     opacity: 0.7,

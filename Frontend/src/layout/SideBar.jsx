@@ -2,7 +2,7 @@ import React from "react";
 import { 
   FaAngleDoubleLeft, FaAngleDoubleRight, FaHome, FaBook, 
   FaFolder, FaCog, FaSignOutAlt, FaUserPlus, FaUsers, 
-  FaHandHolding, FaChartPie 
+  FaHandHolding, FaChartPie, FaGift 
 } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +25,7 @@ const SideBar = ({ isSideBarOpen, setIsSideBarOpen, setSelectedComponent, select
       menuItems.push({ name: "System Stats", icon: <FaChartPie />, component: "Stats" });
       menuItems.push({ name: "Loan Management", icon: <FaHandHolding />, component: "BookManagement" });
       menuItems.push({ name: "Borrowing Logistics", icon: <FaBook />, component: "BorrowRequests" });
+      menuItems.push({ name: "Donations", icon: <FaGift />, component: "DonationRequests" });
       menuItems.push({ name: "Users List", icon: <FaUsers />, component: "AllUsers" });
       if (user?.role === "Super Admin") {
         menuItems.push({ name: "Add Admin", icon: <FaUserPlus />, component: "CreateAdmin" });

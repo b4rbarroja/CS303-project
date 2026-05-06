@@ -38,6 +38,7 @@ const BookCard = (props) => {
   const bookImage = props.image?.url;
   const bookAuthor = props.author || "Unknown Author";
   const bookGenre = props.genre || "Uncategorized";
+  const bookEdition = props.edition || "";
 
   // Availability: prefer explicit availableCopies count over status string
   const availableCopies = Number(props.availableCopies);
@@ -198,6 +199,11 @@ const BookCard = (props) => {
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-70">
           by {bookAuthor}
         </p>
+        {bookEdition && (
+          <p className="text-[10px] font-semibold text-slate-300 uppercase tracking-wider mt-0.5">
+            {bookEdition} Edition
+          </p>
+        )}
       </div>
 
       {/* Status Badge */}

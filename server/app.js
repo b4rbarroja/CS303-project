@@ -12,6 +12,8 @@ import borrowRouter from "./routes/borrowRouter.js";
 import fineRouter from "./routes/fineRouter.js";
 import notificationRouter from "./routes/notificationRouter.js";
 import fileUpload from "express-fileupload";
+import aiRouter from "./routes/aiRoutes.js";
+import donationRouter from "./routes/donationRouter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -76,6 +78,8 @@ app.use("/api/v1/book", bookRouter);
 app.use("/api/v1/borrow", borrowRouter);
 app.use("/api", fineRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/ai", aiRouter);
+app.use("/api/v1/donation", donationRouter);
 
 app.all("*", (req, res) => {
     res.status(404).json({

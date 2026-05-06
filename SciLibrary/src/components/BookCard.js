@@ -9,6 +9,7 @@ export default function BookCard({
   image,
   imageUrl,
   genre,
+  edition,
   status,
   availableCopies,
   totalCopies,
@@ -51,6 +52,13 @@ export default function BookCard({
           <MaterialCommunityIcons name="account" size={14} color={COLORS.neutral[500]} />
           <Text style={styles.author} numberOfLines={1}>{author || 'Unknown Author'}</Text>
         </View>
+
+        {edition ? (
+          <View style={styles.editionContainer}>
+            <MaterialCommunityIcons name="book-open-variant" size={13} color={COLORS.neutral[400]} />
+            <Text style={styles.editionText}>{edition} Edition</Text>
+          </View>
+        ) : null}
 
         <View style={[styles.availabilityBar, { 
           backgroundColor: isAvailable ? `${COLORS.status.available}1A` : `${COLORS.status.unavailable}1A`,
@@ -150,6 +158,18 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.3,
     fontWeight: '700',
+  },
+  editionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 5,
+  },
+  editionText: {
+    fontSize: 11,
+    color: COLORS.neutral[400],
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
 
   availabilityBar: {

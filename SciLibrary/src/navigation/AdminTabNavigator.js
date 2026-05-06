@@ -11,6 +11,7 @@ import BorrowRequestsScreen from '../screens/BorrowRequestsScreen';
 import UsersScreen from '../screens/UsersScreen';
 import StatsScreen from '../screens/StatsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import DonationRequestsScreen from '../screens/DonationRequestsScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -63,6 +64,9 @@ const AdminTabNavigator = () => {
             case 'Users':
               iconName = focused ? 'account-group' : 'account-group-outline';
               break;
+            case 'Donations':
+              iconName = focused ? 'gift' : 'gift-outline';
+              break;
             case 'Profile':
               iconName = focused ? 'account-circle' : 'account-circle-outline';
               break;
@@ -110,6 +114,7 @@ const AdminTabNavigator = () => {
     >
       <Tab.Screen name="Books" component={AdminDashboardScreen} options={{ title: 'Books' }} />
       <Tab.Screen name="Requests" component={BorrowRequestsScreen} options={{ title: 'Requests' }} />
+      <Tab.Screen name="Donations" component={DonationRequestsScreen} options={{ title: 'Donations' }} />
       <Tab.Screen name="Stats" component={StatsScreen} options={{ title: 'Stats' }} />
       <Tab.Screen name="Users" component={UsersScreen} options={{ title: 'Users' }} />
       <Tab.Screen name="Profile" component={SettingsScreen} options={{ title: 'Profile' }} />
