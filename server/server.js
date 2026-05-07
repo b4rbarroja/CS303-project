@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config({ path: "./config/config.env" });
+
 import { app } from "./app.js";
 import { connectDB } from "./database/db.js";
 import { startCleanupScheduler } from "./utils/cleanupUnverifiedAccounts.js";
