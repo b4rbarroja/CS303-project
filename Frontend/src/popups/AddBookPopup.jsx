@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addBook, updateBook } from "../store/slices/bookSlice";
 import { toggleAddBookPopup } from "../store/slices/popUpSlice";
-import { FaTimes, FaCloudUploadAlt, FaBook } from "react-icons/fa";
+import { FaTimes, FaCloudUploadAlt, FaBook, FaStar, FaRegStar } from "react-icons/fa";
 
 const AddBookPopup = ({ editBook }) => {
   const dispatch = useDispatch();
@@ -13,6 +13,7 @@ const AddBookPopup = ({ editBook }) => {
   const [genre, setGenre] = useState("");
   const [edition, setEdition] = useState("");
   const [totalCopies, setTotalCopies] = useState(1);
+  const [rating, setRating] = useState(0);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -26,6 +27,7 @@ const AddBookPopup = ({ editBook }) => {
       setGenre(editBook.genre || "");
       setEdition(editBook.edition || "");
       setTotalCopies(editBook.totalCopies || 1);
+      setRating(editBook.rating || 0);
       setImagePreview(editBook.image?.url || "");
     }
   }, [editBook]);
@@ -65,6 +67,7 @@ const AddBookPopup = ({ editBook }) => {
     formData.append("genre", genre);
     formData.append("edition", edition);
     formData.append("totalCopies", totalCopies);
+    formData.append("rating", rating);
     if (image) {
       formData.append("image", image);
     }
@@ -218,6 +221,34 @@ const AddBookPopup = ({ editBook }) => {
               required
               className="w-full border border-gray-100 bg-gray-50/50 rounded-xl py-3 px-4 focus:ring-2 focus:ring-[#358a74]/20 focus:border-[#358a74] outline-none transition-all"
             />
+          </div>
+
+          {/* Rating */}
+          <div>
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-2 ml-1">
+              Rating
+            </label>
+            <div className="flex items-center gap-2 mb-2">
+              {Array.from({ length: 5 }, (_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setRating(i + 1)}
+                  className="transition-all hover:scale-110 active:scale-95"
+                >
+                  {i < rating ? (
+                    <FaStar size={24} className="text-[#358a74]" />
+                  ) : (
+                    <FaRegStar size={24} className="text-gray-300 hover:text-[#358a74]" />
+                  )}
+                </button>
+              ))}
+            </div>
+            {rating > 0 && (
+              <p className="text-xs font-bold text-[#358a74] uppercase tracking-wider">
+                Rating: {rating}/5
+              </p>
+            )}
           </div>
 
           {/* Error Message */}

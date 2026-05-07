@@ -5,6 +5,8 @@ import {
   FaPlusCircle,
   FaExclamationTriangle,
   FaClock,
+  FaStar,
+  FaRegStar,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +32,7 @@ const BookCard = (props) => {
   // ─── STATE ───
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [liveUser, setLiveUser] = useState(null);
+  const [userRating, setUserRating] = useState(0);
 
   // ─── PROPS EXTRACTION & NORMALIZATION ───
   // Extract ID: support both _id and id formats
@@ -46,6 +49,9 @@ const BookCard = (props) => {
   const isAvailable = hasExplicitStockValue
     ? availableCopies > 0
     : props.status === "Available";
+
+  // Rating: calculate display rating
+  const displayRating = Number.isFinite(Number(props.rating)) ? Math.min(5, Math.max(0, Math.round(Number(props.rating)))) : 0;
 
   // ─── REDUX STATE ───
   const { isAuthenticated, user } = useSelector((state) => state.auth);
@@ -206,6 +212,17 @@ const BookCard = (props) => {
         )}
       </div>
 
+      {/* Rating */}
+      <div className="w-full mb-4 flex items-center gap-1">
+        {Array.from({ length: 5 }, (_, i) => (
+          i < displayRating ? (
+            <FaStar key={i} size={12} className="text-[#358a74]" />
+          ) : (
+            <FaRegStar key={i} size={12} className="text-slate-300" />
+          )
+        ))}
+      </div>
+
       {/* Status Badge */}
       <div className="w-full mb-6">
         <div
@@ -243,6 +260,35 @@ const BookCard = (props) => {
           </span>
         </div>
       </div>
+
+      {/* Interactive Rating */}
+      {isAuthenticated && (
+        <div className="w-full mb-4">
+          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">
+            Rate this book
+          </p>
+          <div className="flex items-center justify-center gap-1 mb-2">
+            {Array.from({ length: 5 }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setUserRating(i + 1)}
+                className="transition-all hover:scale-110 active:scale-95"
+              >
+                {i < userRating ? (
+                  <FaStar size={16} className="text-[#358a74]" />
+                ) : (
+                  <FaRegStar size={16} className="text-slate-300 hover:text-[#358a74]" />
+                )}
+              </button>
+            ))}
+          </div>
+          {userRating > 0 && (
+            <p className="text-[8px] font-bold text-[#358a74] text-center uppercase tracking-widest">
+              You rated: {userRating}/5
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Action Button */}
       <button
