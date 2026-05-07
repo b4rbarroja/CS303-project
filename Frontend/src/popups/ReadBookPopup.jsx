@@ -74,20 +74,20 @@ const ReadBookPopup = ({ book, setEditBook }) => {
         <div className="p-8 space-y-6">
           <div className="text-center">
             <h2 className="text-2xl font-black text-gray-900 tracking-tighter">{book?.title}</h2>
-            {displayRating > 0 && (
-              <div className="flex items-center justify-center gap-1 mt-3">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <span key={i} className="text-sm">
-                    {i < displayRating ? (
-                      <FaStar className="text-[#358a74]" />
-                    ) : (
-                      <FaRegStar className="text-gray-300" />
-                    )}
-                  </span>
-                ))}
-                <span className="text-xs font-semibold text-gray-500">{displayRating}/5</span>
-              </div>
-            )}
+            <div className="flex items-center justify-center gap-1 mt-3">
+              {Array.from({ length: 5 }, (_, i) => (
+                <span key={i} className="text-sm">
+                  {i < displayRating ? (
+                    <FaStar className="text-[#358a74]" />
+                  ) : (
+                    <FaRegStar className="text-gray-300" />
+                  )}
+                </span>
+              ))}
+              <span className="text-xs font-semibold text-gray-500">
+                {displayRating > 0 ? `${displayRating}/5` : "Unrated"}
+              </span>
+            </div>
             <p className="text-[#358a74] text-[10px] font-black mt-1 uppercase tracking-[0.2em]">{book?.genre}</p>
           </div>
 
