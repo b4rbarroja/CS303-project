@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { recordBorrowBook } from '../store/slices/borrowSlice';
 import {
@@ -18,12 +19,15 @@ import {
   isBorrowActive,
 } from '../utils/dataShapeNormalizer';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '../../shared/designTokens';
+import { rateBook, fetchMyRating } from '../store/books';
 
 export default function BookDetailsScreen({ route, navigation }) {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { userBorrowedBooks = [] } = useSelector((state) => state.borrow);
   const [borrowing, setBorrowing] = useState(false);
+  const [userRating, setUserRating] = useState(0); 
+  const [ratingSubmitting, setRatingSubmitting] = useState(false);
 
   const incomingBook = route?.params?.book;
   const book = useMemo(() => normalizeBook(incomingBook || {}), [incomingBook]);
@@ -54,6 +58,57 @@ export default function BookDetailsScreen({ route, navigation }) {
       return (normalized.status || '').toLowerCase() === 'overdue';
     });
   }, [isAuthenticated, userBorrowedBooks]);
+
+  const hasBorrowedBookInHistory = useMemo(() => {
+    if (!isAuthenticated || !book?.id) return false;
+    return userBorrowedBooks.some((record) => {
+      const normalized = normalizeBorrowRecord(record);
+      const sameBook = normalized.bookId === book.id;
+      const validStatus = ['borrowed', 'returned'].includes((normalized.status || '').toLowerCase());
+      return sameBook && validStatus;
+    });
+  }, [isAuthenticated, book?.id, userBorrowedBooks]);
+
+  // Load user's previous rating on mount
+  React.useEffect(() => {
+    if (isAuthenticated && book?.id) {
+      dispatch(fetchMyRating(book.id)).unwrap()
+        .then((res) => {
+          if (res?.rating) {
+            setUserRating(res.rating);
+          }
+        })
+        .catch((e) => {
+          // Ignore 404 or errors since it just means they haven't rated
+        });
+    }
+  }, [isAuthenticated, book?.id, dispatch]);
+
+  const handleRateBook = async (ratingValue) => {
+    if (!isAuthenticated) {
+      Alert.alert('Login Required', 'You must be logged in to rate a book.');
+      return;
+    }
+    if (hasOverdueBooks) {
+      Alert.alert('Action Blocked', 'You cannot rate books while you have overdue items.');
+      return;
+    }
+    if (!hasBorrowedBookInHistory) {
+      Alert.alert('Action Blocked', 'You can only rate books you have borrowed.');
+      return;
+    }
+
+    setRatingSubmitting(true);
+    try {
+      await dispatch(rateBook({ id: book.id, rating: ratingValue })).unwrap();
+      setUserRating(ratingValue);
+      Alert.alert('Success', ratingValue > 0 ? 'Thanks for updating your rating!' : 'Thanks for rating!');
+    } catch (error) {
+      Alert.alert('Error', typeof error === 'string' ? error : 'Failed to submit rating.');
+    } finally {
+      setRatingSubmitting(false);
+    }
+  };
 
   const handleBorrow = async () => {
     if (!isAuthenticated) {
@@ -177,6 +232,43 @@ export default function BookDetailsScreen({ route, navigation }) {
         <View style={styles.detailsCard}>
           <Text style={styles.bookTitle}>{book.title}</Text>
           <Text style={styles.bookAuthor}>by {book.author || 'Unknown Author'}</Text>
+
+          <View style={styles.ratingSection}>
+            <Text style={styles.ratingLabel}>Rating</Text>
+            <View style={styles.ratingDisplay}>
+              {Array.from({ length: 5 }, (_, i) => (
+                <MaterialCommunityIcons
+                  key={i}
+                  name={i < (book.rating || 0) ? 'star' : 'star-outline'}
+                  size={24}
+                  color={COLORS.brand.primary}
+                />
+              ))}
+              <Text style={styles.ratingText}>{book.rating ? `${book.rating}/5` : 'Not rated'}</Text>
+            </View>
+          </View>
+
+          <View style={styles.ratingSection}>
+            <Text style={styles.ratingLabel}>Rate this book</Text>
+            {ratingSubmitting ? (
+              <ActivityIndicator size="small" color={COLORS.brand.primary} />
+            ) : (
+              <View style={styles.ratingInput}>
+                {Array.from({ length: 5 }, (_, i) => (
+                  <TouchableOpacity key={i} onPress={() => handleRateBook(i + 1)}>
+                    <MaterialCommunityIcons
+                      name={i < userRating ? 'star' : 'star-outline'}
+                      size={32}
+                      color={COLORS.brand.primary}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+            {userRating > 0 && (
+              <Text style={styles.userRatingText}>You rated: {userRating}/5</Text>
+            )}
+          </View>
 
           <View style={styles.metaGrid}>
             <View style={styles.metaItem}>
@@ -310,6 +402,35 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.md,
     marginTop: SPACING.xs,
     marginBottom: SPACING.lg,
+  },
+  ratingSection: {
+    marginBottom: SPACING.lg,
+  },
+  ratingLabel: {
+    color: COLORS.text.primary,
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: TYPOGRAPHY.weights.medium,
+    marginBottom: SPACING.sm,
+  },
+  ratingDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  ratingText: {
+    color: COLORS.text.secondary,
+    fontSize: TYPOGRAPHY.sizes.sm,
+    marginLeft: SPACING.xs,
+  },
+  ratingInput: {
+    flexDirection: 'row',
+    gap: SPACING.xs,
+  },
+  userRatingText: {
+    color: COLORS.brand.primary,
+    fontSize: TYPOGRAPHY.sizes.sm,
+    marginTop: SPACING.xs,
+    fontWeight: TYPOGRAPHY.weights.medium,
   },
   metaGrid: {
     flexDirection: 'row',

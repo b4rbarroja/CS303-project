@@ -2,7 +2,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-const MY_IP_ADDRESS = '192.168.1.25'; //Put ur Laptop's IP address here
+// ⚠️  Change this to your machine's local IP before running on a physical device
+const MY_IP_ADDRESS = '192.168.1.5';
 
 const baseURL = __DEV__ ? `http://${MY_IP_ADDRESS}:5000` : 'https://api.your-production-domain.com';
 
@@ -10,7 +11,6 @@ const API = axios.create({
   baseURL,
   timeout: 15000,
 });
-
 
 API.interceptors.request.use(
   async (config) => {
@@ -27,7 +27,6 @@ API.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 
 API.interceptors.response.use(
   (response) => response,

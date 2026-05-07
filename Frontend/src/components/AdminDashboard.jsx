@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { 
   FaPlus, FaTrash, FaEdit, FaEye, FaLayerGroup, 
-  FaShieldAlt, FaBookOpen, FaInbox, FaMoneyBillWave, FaBan 
+  FaShieldAlt, FaBookOpen, FaInbox, FaMoneyBillWave, FaBan, FaStar, FaRegStar 
 } from "react-icons/fa";
 import { fetchAllBooks, deleteBook, resetBookSlice } from "../store/slices/bookSlice";
 import { toggleAddBookPopup, toggleReadBookPopup } from "../store/slices/popUpSlice";
@@ -49,6 +49,9 @@ const AdminDashboard = ({ searchTerm = "" }) => {
   useEffect(() => {
     dispatch(fetchAllBooks());
   }, [dispatch]);
+
+  const normalizeRating = (rating) =>
+    Number.isFinite(Number(rating)) ? Math.min(5, Math.max(0, Math.round(Number(rating)))) : 0;
 
   // Handle Notifications & State Reset
   useEffect(() => {
@@ -338,6 +341,18 @@ const AdminDashboard = ({ searchTerm = "" }) => {
                         <div>
                           <p className="text-sm font-black text-slate-900 leading-none">{book.title}</p>
                           <p className="text-[10px] font-bold text-[#358a74] uppercase tracking-tighter mt-1">{book.author}</p>
+                          <div className="mt-2 flex items-center justify-center gap-1">
+                            {Array.from({ length: 5 }, (_, i) => (
+                              i < normalizeRating(book.rating) ? (
+                                <FaStar key={i} className="text-[#358a74] text-[10px]" />
+                              ) : (
+                                <FaRegStar key={i} className="text-slate-300 text-[10px]" />
+                              )
+                            ))}
+                            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
+                              {normalizeRating(book.rating) > 0 ? `${normalizeRating(book.rating)}/5` : "Unrated"}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </td>

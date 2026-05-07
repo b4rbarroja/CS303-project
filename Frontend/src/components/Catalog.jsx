@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAllBooks, deleteBook } from "../store/slices/bookSlice";
 import { toggleReadBookPopup, toggleAddBookPopup } from "../store/slices/popUpSlice";
-import { FaBook, FaUserShield, FaBookOpen, FaTrash, FaEdit } from "react-icons/fa";
+import { FaBook, FaUserShield, FaBookOpen, FaTrash, FaEdit, FaStar, FaRegStar } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ReadBookPopup from "../popups/ReadBookPopup";
 import AddBookPopup from "../popups/AddBookPopup";
@@ -31,6 +31,7 @@ const Catalog = ({ searchTerm = "" }) => {
 
   const isAdmin = user?.role === "Admin" || user?.role === "Super Admin";
   const genres = ["All", ...new Set(books.map((b) => b.genre).filter(Boolean))];
+  const normalizeRating = (rating) => Number.isFinite(Number(rating)) ? Math.min(5, Math.max(0, Math.round(Number(rating)))) : 0;
 
   const filteredBooks = books.filter((book) => {
     const matchesSearch = book.title?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -120,6 +121,18 @@ const Catalog = ({ searchTerm = "" }) => {
               </div>
               <div className="mb-4 w-full text-center">
                 <h3 className="font-black text-slate-800 text-sm ">{book.title}</h3>
+                <div className="mt-2 flex items-center justify-center gap-1 text-xs text-slate-400">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    i < normalizeRating(book.rating) ? (
+                      <FaStar key={i} className="text-[#358a74]" />
+                    ) : (
+                      <FaRegStar key={i} className="text-slate-200" />
+                    )
+                  ))}
+                  <span className="font-black uppercase tracking-[0.15em] text-slate-400">
+                    {normalizeRating(book.rating)}/5
+                  </span>
+                </div>
                 <div className={`mt-2 inline-block px-3 py-1 rounded-full text-[8px] font-black uppercase ${book.status === 'Available' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}`}>
                   {book.status}
                 </div>

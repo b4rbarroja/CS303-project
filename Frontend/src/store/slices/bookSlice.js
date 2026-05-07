@@ -85,6 +85,16 @@ const bookSlice = createSlice({
       }
     },
 
+    // Optimistically update rating in the books array after a successful submission
+    updateBookRating(state, action) {
+      const { bookId, rating, ratingCount } = action.payload;
+      const idx = state.books.findIndex((b) => (b._id || b.id) === bookId);
+      if (idx !== -1) {
+        state.books[idx].rating = rating;
+        state.books[idx].ratingCount = ratingCount;
+      }
+    },
+
     resetBookSlice(state) {
       state.error = null;
       state.message = null;
@@ -93,7 +103,7 @@ const bookSlice = createSlice({
   },
 });
 
-// ── Async Actions ──
+// ── Async Actions ──────────────────────────────────────────────────────────────
 
 export const fetchAllBooks = () => (dispatch) => {
   dispatch(bookSlice.actions.fetchBooksRequest());
@@ -149,10 +159,43 @@ export const deleteBook = (id) => (dispatch) => {
     );
 };
 
-export const { updateBookStatus } = bookSlice.actions;
+/**
+ * rateBook — POST /api/v1/book/:id/rate
+ * Returns { ok, rating, ratingCount, userRating } on success
+ *         { ok: false, error } on failure
+ */
+export const rateBook = ({ bookId, rating }) => async (dispatch) => {
+  try {
+    const res = await api.post(`/api/v1/book/${bookId}/rate`, { rating });
+    const { rating: newAvg, ratingCount, userRating } = res.data.data;
+
+    // Update the in-memory books list immediately (no full refetch needed)
+    dispatch(bookSlice.actions.updateBookRating({ bookId, rating: newAvg, ratingCount }));
+
+    return { ok: true, rating: newAvg, ratingCount, userRating };
+  } catch (error) {
+    return { ok: false, error: getErrorMsg(error) };
+  }
+};
+
+/**
+ * fetchMyRating — GET /api/v1/book/:id/myrating
+ * Returns { ok, userRating, rating, ratingCount } on success
+ */
+export const fetchMyRating = (bookId) => async () => {
+  try {
+    const res = await api.get(`/api/v1/book/${bookId}/myrating`);
+    const { userRating, rating, ratingCount } = res.data.data;
+    return { ok: true, userRating, rating, ratingCount };
+  } catch {
+    return { ok: false, userRating: 0, rating: 0, ratingCount: 0 };
+  }
+};
+
+export const { updateBookStatus, updateBookRating } = bookSlice.actions;
 
 export const resetBookSlice = () => (dispatch) => {
   dispatch(bookSlice.actions.resetBookSlice());
 };
 
-export default bookSlice.reducer;
+export default bookSlice.reducer;

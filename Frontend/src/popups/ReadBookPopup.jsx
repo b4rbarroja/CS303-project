@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleReadBookPopup, toggleAddBookPopup } from "../store/slices/popUpSlice";
 import { recordBorrowBook, resetBorrowSliceAction } from "../store/slices/borrowSlice";
 import { deleteBook } from "../store/slices/bookSlice"; 
-import { FaTimes, FaBook, FaCheckCircle, FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaTimes, FaBook, FaCheckCircle, FaEdit, FaTrashAlt, FaStar, FaRegStar } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const ReadBookPopup = ({ book, setEditBook }) => {
   const dispatch = useDispatch();
+  const displayRating = Number.isFinite(Number(book?.rating)) ? Math.min(5, Math.max(0, Math.round(Number(book.rating)))) : 0;
   
   const { loading: borrowLoading, message, error } = useSelector((state) => state.borrow || {});
   const { user } = useSelector((state) => state.auth || {});
@@ -73,6 +74,20 @@ const ReadBookPopup = ({ book, setEditBook }) => {
         <div className="p-8 space-y-6">
           <div className="text-center">
             <h2 className="text-2xl font-black text-gray-900 tracking-tighter">{book?.title}</h2>
+            <div className="flex items-center justify-center gap-1 mt-3">
+              {Array.from({ length: 5 }, (_, i) => (
+                <span key={i} className="text-sm">
+                  {i < displayRating ? (
+                    <FaStar className="text-[#358a74]" />
+                  ) : (
+                    <FaRegStar className="text-gray-300" />
+                  )}
+                </span>
+              ))}
+              <span className="text-xs font-semibold text-gray-500">
+                {displayRating > 0 ? `${displayRating}/5` : "Unrated"}
+              </span>
+            </div>
             <p className="text-[#358a74] text-[10px] font-black mt-1 uppercase tracking-[0.2em]">{book?.genre}</p>
           </div>
 

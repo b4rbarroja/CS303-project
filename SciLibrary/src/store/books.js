@@ -41,6 +41,24 @@ export const deleteBook = createAsyncThunk("book/delete", async (id, { rejectWit
     }
 });
 
+export const rateBook = createAsyncThunk("book/rate", async ({ id, rating }, { rejectWithValue }) => {
+    try {
+        const response = await API.post(`/api/v1/book/${id}/rate`, { rating });
+        return response.data.data; // returns { rating, ratingCount, userRating }
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to rate book");
+    }
+});
+
+export const fetchMyRating = createAsyncThunk("book/fetchMyRating", async (id, { rejectWithValue }) => {
+    try {
+        const response = await API.get(`/api/v1/book/${id}/myrating`);
+        return { id, rating: response.data.data.rating };
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to fetch rating");
+    }
+});
+
 const bookSlice = createSlice({
     name: "book",
     initialState: {
@@ -96,6 +114,14 @@ const bookSlice = createSlice({
             .addCase(deleteBook.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            // rateBook
+            .addCase(rateBook.fulfilled, (state, action) => {
+                const index = state.books.findIndex((b) => b.id === action.meta.arg.id || b._id === action.meta.arg.id);
+                if (index !== -1) {
+                    state.books[index].rating = action.payload.rating;
+                    state.books[index].ratingCount = action.payload.ratingCount;
+                }
             });
     },
 });
