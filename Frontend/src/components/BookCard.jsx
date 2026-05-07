@@ -223,6 +223,17 @@ const BookCard = (props) => {
         ))}
       </div>
 
+      {/* Rating */}
+      <div className="w-full mb-4 flex items-center gap-1">
+        {Array.from({ length: 5 }, (_, i) => (
+          i < displayRating ? (
+            <FaStar key={i} size={12} className="text-[#358a74]" />
+          ) : (
+            <FaRegStar key={i} size={12} className="text-slate-300" />
+          )
+        ))}
+      </div>
+
       {/* Status Badge */}
       <div className="w-full mb-6">
         <div

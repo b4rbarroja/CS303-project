@@ -2,11 +2,15 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 const MY_IP_ADDRESS = '192.168.1.25'; //Put ur Laptop's IP address here
 =======
 const MY_IP_ADDRESS = '192.168.100.30'; //Put ur Laptop's IP address here
 >>>>>>> 0e004802 (added book rating system in the mobile app)
+=======
+const MY_IP_ADDRESS = '192.168.100.30'; //Put ur Laptop's IP address here
+>>>>>>> origin/mobileRating
 
 const baseURL = __DEV__ ? `http://${MY_IP_ADDRESS}:5000` : 'https://api.your-production-domain.com';
 
