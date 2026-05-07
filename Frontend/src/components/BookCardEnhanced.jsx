@@ -10,6 +10,8 @@ import {
   FaPlusCircle,
   FaExclamationTriangle,
   FaClock,
+  FaStar,
+  FaRegStar,
 } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -40,6 +42,7 @@ const BookCardEnhanced = (props) => {
   // ─── STATE ───
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [userRating, setUserRating] = useState(0);
 
   // ─── PROPS EXTRACTION & NORMALIZATION ───
   const bookId = extractBookId(props);
@@ -336,6 +339,41 @@ const BookCardEnhanced = (props) => {
           {statusInfo.label}
         </span>
       </div>
+
+      {/* Interactive Rating */}
+      {isAuthenticated && (
+        <div className="w-full mb-4">
+          <p
+            className="text-xs font-black uppercase tracking-wider mb-2 text-center opacity-60"
+            style={{ color: DESIGN_TOKENS.COLORS.text.secondary }}
+          >
+            Rate this book
+          </p>
+          <div className="flex items-center justify-center gap-1 mb-2">
+            {Array.from({ length: 5 }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setUserRating(i + 1)}
+                className="transition-all hover:scale-110 active:scale-95"
+              >
+                {i < userRating ? (
+                  <FaStar size={18} style={{ color: DESIGN_TOKENS.COLORS.brand.primary }} />
+                ) : (
+                  <FaRegStar size={18} style={{ color: DESIGN_TOKENS.COLORS.neutral[300] }} />
+                )}
+              </button>
+            ))}
+          </div>
+          {userRating > 0 && (
+            <p
+              className="text-xs font-bold text-center uppercase tracking-wider"
+              style={{ color: DESIGN_TOKENS.COLORS.brand.primary }}
+            >
+              You rated: {userRating}/5
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Action Button */}
       <button
