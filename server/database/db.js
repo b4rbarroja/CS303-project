@@ -1,4 +1,6 @@
 import admin from "firebase-admin";
+import dotenv from "dotenv";
+dotenv.config({ path: "./config/config.env" });
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -6,16 +8,17 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-let serviceAccount;
-
-try {
-  serviceAccount = JSON.parse(
-    readFileSync(join(__dirname, "..", "serviceAccountKey.json"), "utf-8")
-  );
-} catch (error) {
-  console.error(" Error: 'serviceAccountKey.json' is missing or invalid. Please check the server/ folder.");
-  process.exit(1); 
-}
+const serviceAccount = {
+  type: process.env.FIREBASE_TYPE,
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_CLIENT_ID,
+  auth_uri: process.env.FIREBASE_AUTH_URI,
+  token_uri: process.env.FIREBASE_TOKEN_URI,
+  client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL
+};
 
 if (admin.apps.length === 0) {
   admin.initializeApp({
