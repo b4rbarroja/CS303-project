@@ -1,5 +1,5 @@
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import {
   FaBookOpen,
   FaPlusCircle,
@@ -20,10 +20,11 @@ import {
 } from "../utils/dataShapeNormalizer";
 import { notifyWarning, notifyInfo, notifyError } from "../utils/toastNotificationManager";
 import { ImSpinner2 } from "react-icons/im";
+import { fetchMyRating } from "../store/slices/bookSlice";
+import RateBookPopup from "../popups/RateBookPopup";
 
 import { db } from "../utils/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
-import { useEffect } from "react";
 
 const BookCard = (props) => {
   const dispatch = useDispatch();
@@ -32,7 +33,10 @@ const BookCard = (props) => {
   // ─── STATE ───
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [liveUser, setLiveUser] = useState(null);
-  const [userRating, setUserRating] = useState(0);
+  const [showRatePopup, setShowRatePopup] = useState(false);
+  const [myRating, setMyRating] = useState(0);
+  const [liveRating, setLiveRating] = useState(null);     // null = use props
+  const [liveRatingCount, setLiveRatingCount] = useState(null);
 
   // ─── PROPS EXTRACTION & NORMALIZATION ───
   // Extract ID: support both _id and id formats
@@ -50,8 +54,11 @@ const BookCard = (props) => {
     ? availableCopies > 0
     : props.status === "Available";
 
-  // Rating: calculate display rating
-  const displayRating = Number.isFinite(Number(props.rating)) ? Math.min(5, Math.max(0, Math.round(Number(props.rating)))) : 0;
+  // Rating: use live value if we have it (after a rating submission), else fall back to prop
+  const displayRating = liveRating !== null
+    ? liveRating
+    : (Number.isFinite(Number(props.rating)) ? Math.min(5, Math.max(0, Number(props.rating))) : 0);
+  const displayRatingCount = liveRatingCount !== null ? liveRatingCount : (props.ratingCount || 0);
 
   // ─── REDUX STATE ───
   const { isAuthenticated, user } = useSelector((state) => state.auth);
@@ -68,6 +75,14 @@ const BookCard = (props) => {
     });
     return () => unsub();
   }, [isAuthenticated, user?.id]);
+
+  // Load user's existing rating for this book when authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !bookId) return;
+    dispatch(fetchMyRating(bookId)).then((res) => {
+      if (res?.ok) setMyRating(res.userRating || 0);
+    });
+  }, [isAuthenticated, bookId, dispatch]);
 
   // ─── FIND ACTIVE BORROW RECORD FOR THIS BOOK ───
   // Search across different payload shapes
@@ -212,15 +227,25 @@ const BookCard = (props) => {
         )}
       </div>
 
-      {/* Rating */}
-      <div className="w-full mb-4 flex items-center gap-1">
-        {Array.from({ length: 5 }, (_, i) => (
-          i < displayRating ? (
-            <FaStar key={i} size={12} className="text-[#358a74]" />
-          ) : (
-            <FaRegStar key={i} size={12} className="text-slate-300" />
-          )
-        ))}
+      {/* Rating — display average + count chip */}
+      <div className="w-full mb-3 flex items-center gap-2">
+        <div className="flex items-center gap-0.5">
+          {Array.from({ length: 5 }, (_, i) => (
+            i < Math.round(displayRating) ? (
+              <FaStar key={i} size={12} className="text-[#358a74]" />
+            ) : (
+              <FaRegStar key={i} size={12} className="text-slate-300" />
+            )
+          ))}
+        </div>
+        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+          {displayRating > 0
+            ? `${displayRating.toFixed ? displayRating.toFixed(1) : displayRating}/5`
+            : "Unrated"}
+          {displayRatingCount > 0 && (
+            <span className="ml-1 text-slate-300">({displayRatingCount})</span>
+          )}
+        </span>
       </div>
 
       {/* Status Badge */}
@@ -261,33 +286,27 @@ const BookCard = (props) => {
         </div>
       </div>
 
-      {/* Interactive Rating */}
+      {/* Interactive Rating — popup trigger button */}
       {isAuthenticated && (
         <div className="w-full mb-4">
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">
-            Rate this book
-          </p>
-          <div className="flex items-center justify-center gap-1 mb-2">
-            {Array.from({ length: 5 }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => setUserRating(i + 1)}
-                className="transition-all hover:scale-110 active:scale-95"
-              >
-                {i < userRating ? (
-                  <FaStar size={16} className="text-[#358a74]" />
-                ) : (
-                  <FaRegStar size={16} className="text-slate-300 hover:text-[#358a74]" />
-                )}
-              </button>
-            ))}
-          </div>
-          {userRating > 0 && (
-            <p className="text-[8px] font-bold text-[#358a74] text-center uppercase tracking-widest">
-              You rated: {userRating}/5
-            </p>
-          )}
+          <button
+            id={`rate-book-btn-${bookId}`}
+            onClick={(e) => { e.stopPropagation(); setShowRatePopup(true); }}
+            className="w-full py-2.5 rounded-2xl border border-dashed border-slate-200 text-[9px] font-black uppercase tracking-widest text-slate-400 hover:border-[#358a74] hover:text-[#358a74] hover:bg-emerald-50/50 transition-all flex items-center justify-center gap-1.5 active:scale-95"
+          >
+            <FaStar size={11} />
+            {myRating > 0 ? `Your rating: ${myRating}/5 · Edit` : "Rate this book"}
+          </button>
         </div>
+      )}
+
+      {/* Rating Popup */}
+      {showRatePopup && (
+        <RateBookPopup
+          book={{ ...props, id: bookId }}
+          initialUserRating={myRating}
+          onClose={() => setShowRatePopup(false)}
+        />
       )}
 
       {/* Action Button */}

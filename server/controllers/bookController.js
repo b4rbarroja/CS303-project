@@ -2,6 +2,7 @@ import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/errorMiddlewares.js";
 import { db } from "../database/db.js";
 import cloudinary from "cloudinary";
+import { FieldValue } from "firebase-admin/firestore";
 
 // Get All Books (Added Pagination for DB DoS Protection)
 export const getAllBooks = catchAsyncErrors(async (req, res, next) => {
@@ -233,6 +234,111 @@ export const deleteBook = catchAsyncErrors(async (req, res, next) => {
         success: true,
         message: "Book and its image deleted successfully.",
         data: null,
+        error: null,
+    });
+});
+
+// 4. Rate a Book (authenticated users only) — upserts user vote, recalculates average atomically
+export const rateBook = catchAsyncErrors(async (req, res, next) => {
+    const bookId = req.params.id;
+    const userId  = req.user.id;
+    const { rating } = req.body;
+
+    // Validate rating value
+    const score = parseInt(rating);
+    if (isNaN(score) || score < 1 || score > 5) {
+        return next(new ErrorHandler("Rating must be a whole number between 1 and 5.", 400));
+    }
+
+    // Check if user has overdue books
+    const overdueSnapshot = await db.collection("borrow")
+        .where("user_id", "==", userId)
+        .where("status", "==", "Overdue")
+        .limit(1)
+        .get();
+
+    if (!overdueSnapshot.empty) {
+        return next(new ErrorHandler("You cannot rate books while you have overdue items.", 403));
+    }
+
+    // Check if user has borrowed this specific book
+    const borrowHistory = await db.collection("borrow")
+        .where("user_id", "==", userId)
+        .where("book_id", "==", bookId)
+        .get();
+
+    const hasBorrowed = borrowHistory.docs.some(doc => {
+        const status = doc.data().status;
+        return status === "Borrowed" || status === "Returned";
+    });
+
+    if (!hasBorrowed) {
+        return next(new ErrorHandler("You can only rate books you have actually borrowed.", 403));
+    }
+
+    const bookRef = db.collection("books").doc(bookId);
+
+    let resultData;
+
+    await db.runTransaction(async (transaction) => {
+        const bookDoc = await transaction.get(bookRef);
+        if (!bookDoc.exists) throw new ErrorHandler("Book not found.", 404);
+
+        const data = bookDoc.data();
+
+        // ratings is a map of { userId: score } stored on the document
+        const existingRatings = data.ratings || {};
+        const previousScore   = existingRatings[userId] || 0;
+        const hadPreviousVote  = previousScore > 0;
+
+        // Recalculate running totals
+        const oldSum   = data.ratingSum   || 0;
+        const oldCount = data.ratingCount || 0;
+
+        const newSum   = oldSum - previousScore + score;
+        const newCount = hadPreviousVote ? oldCount : oldCount + 1;
+        const newAvg   = newCount > 0 ? parseFloat((newSum / newCount).toFixed(2)) : 0;
+
+        transaction.update(bookRef, {
+            [`ratings.${userId}`]: score, // upsert into the ratings map
+            ratingSum:   newSum,
+            ratingCount: newCount,
+            rating:      newAvg,
+            updatedAt:   new Date(),
+        });
+
+        resultData = { rating: newAvg, ratingCount: newCount, userRating: score };
+    });
+
+    res.status(200).json({
+        success: true,
+        message: "Rating submitted successfully.",
+        data: resultData,
+        error: null,
+    });
+});
+
+// 5. Get My Rating for a Book — returns the calling user's existing vote (0 if never rated)
+export const getMyRating = catchAsyncErrors(async (req, res, next) => {
+    const bookId = req.params.id;
+    const userId  = req.user.id;
+
+    const bookDoc = await db.collection("books").doc(bookId).get();
+    if (!bookDoc.exists) {
+        return next(new ErrorHandler("Book not found.", 404));
+    }
+
+    const data = bookDoc.data();
+    const userRating = (data.ratings && data.ratings[userId]) || 0;
+
+    res.status(200).json({
+        success: true,
+        message: "User rating fetched.",
+        data: {
+            userRating,
+            rating:      data.rating      || 0,
+            ratingCount: data.ratingCount || 0,
+        },
         error: null,
     });
 });

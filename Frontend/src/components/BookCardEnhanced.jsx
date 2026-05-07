@@ -1,10 +1,4 @@
-/**
- * BookCard (Enhanced with Design Tokens)
- * Now uses design tokens for consistent styling across web and mobile
- * Maintains all existing functionality with improved design system
- */
-
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import {
   FaBookOpen,
   FaPlusCircle,
@@ -34,6 +28,8 @@ import {
   DESIGN_TOKENS 
 } from "../utils/designTokens";
 import { ImSpinner2 } from "react-icons/im";
+import { fetchMyRating } from "../store/slices/bookSlice";
+import RateBookPopup from "../popups/RateBookPopup";
 
 const BookCardEnhanced = (props) => {
   const dispatch = useDispatch();
@@ -42,7 +38,8 @@ const BookCardEnhanced = (props) => {
   // ─── STATE ───
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [userRating, setUserRating] = useState(0);
+  const [showRatePopup, setShowRatePopup] = useState(false);
+  const [myRating, setMyRating] = useState(0);
 
   // ─── PROPS EXTRACTION & NORMALIZATION ───
   const bookId = extractBookId(props);
@@ -51,6 +48,7 @@ const BookCardEnhanced = (props) => {
   const bookAuthor = props.author || "Unknown Author";
   const bookGenre = props.genre || "Uncategorized";
   const bookRating = props.rating || 0;
+  const bookRatingCount = props.ratingCount || 0;
   const bookReviews = props.reviews || [];
 
   // Availability logic
@@ -63,6 +61,14 @@ const BookCardEnhanced = (props) => {
   // ─── REDUX STATE ───
   const { isAuthenticated } = useSelector((state) => state.auth);
   const { userBorrowedBooks = [] } = useSelector((state) => state.borrow);
+
+  // Load user's existing rating for this book when authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !bookId) return;
+    dispatch(fetchMyRating(bookId)).then((res) => {
+      if (res?.ok) setMyRating(res.userRating || 0);
+    });
+  }, [isAuthenticated, bookId, dispatch]);
 
   // ─── FIND ACTIVE BORROW RECORD ───
   const findUserBorrowRecord = useCallback(() => {
@@ -263,7 +269,10 @@ const BookCardEnhanced = (props) => {
               color: DESIGN_TOKENS.COLORS.status.warning,
             }}
           >
-            ⭐ {bookRating.toFixed(1)}
+            ⭐ {typeof bookRating === 'number' ? bookRating.toFixed(1) : bookRating}
+            {bookRatingCount > 0 && (
+              <span className="text-[9px] opacity-70 ml-0.5">({bookRatingCount})</span>
+            )}
           </div>
         )}
       </div>
@@ -340,39 +349,31 @@ const BookCardEnhanced = (props) => {
         </span>
       </div>
 
-      {/* Interactive Rating */}
+      {/* Interactive Rating — popup trigger */}
       {isAuthenticated && (
         <div className="w-full mb-4">
-          <p
-            className="text-xs font-black uppercase tracking-wider mb-2 text-center opacity-60"
-            style={{ color: DESIGN_TOKENS.COLORS.text.secondary }}
+          <button
+            id={`rate-book-enhanced-btn-${bookId}`}
+            onClick={(e) => { e.stopPropagation(); setShowRatePopup(true); }}
+            className="w-full py-2.5 rounded-2xl border border-dashed text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 active:scale-95"
+            style={{
+              borderColor: DESIGN_TOKENS.COLORS.border.light,
+              color: myRating > 0 ? DESIGN_TOKENS.COLORS.brand.primary : DESIGN_TOKENS.COLORS.text.tertiary,
+            }}
           >
-            Rate this book
-          </p>
-          <div className="flex items-center justify-center gap-1 mb-2">
-            {Array.from({ length: 5 }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => setUserRating(i + 1)}
-                className="transition-all hover:scale-110 active:scale-95"
-              >
-                {i < userRating ? (
-                  <FaStar size={18} style={{ color: DESIGN_TOKENS.COLORS.brand.primary }} />
-                ) : (
-                  <FaRegStar size={18} style={{ color: DESIGN_TOKENS.COLORS.neutral[300] }} />
-                )}
-              </button>
-            ))}
-          </div>
-          {userRating > 0 && (
-            <p
-              className="text-xs font-bold text-center uppercase tracking-wider"
-              style={{ color: DESIGN_TOKENS.COLORS.brand.primary }}
-            >
-              You rated: {userRating}/5
-            </p>
-          )}
+            <FaStar size={12} />
+            {myRating > 0 ? `Your rating: ${myRating}/5 · Edit` : "Rate this book"}
+          </button>
         </div>
+      )}
+
+      {/* Rating Popup */}
+      {showRatePopup && (
+        <RateBookPopup
+          book={{ ...props, id: bookId }}
+          initialUserRating={myRating}
+          onClose={() => setShowRatePopup(false)}
+        />
       )}
 
       {/* Action Button */}

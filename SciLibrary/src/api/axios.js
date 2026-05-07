@@ -1,16 +1,9 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-const MY_IP_ADDRESS = '192.168.1.25'; //Put ur Laptop's IP address here
-=======
-const MY_IP_ADDRESS = '192.168.100.30'; //Put ur Laptop's IP address here
->>>>>>> 0e004802 (added book rating system in the mobile app)
-=======
-const MY_IP_ADDRESS = '192.168.100.30'; //Put ur Laptop's IP address here
->>>>>>> origin/mobileRating
+// ⚠️  Change this to your machine's local IP before running on a physical device
+const MY_IP_ADDRESS = '192.168.1.5';
 
 const baseURL = __DEV__ ? `http://${MY_IP_ADDRESS}:5000` : 'https://api.your-production-domain.com';
 
@@ -18,7 +11,6 @@ const API = axios.create({
   baseURL,
   timeout: 15000,
 });
-
 
 API.interceptors.request.use(
   async (config) => {
@@ -35,7 +27,6 @@ API.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 
 API.interceptors.response.use(
   (response) => response,
