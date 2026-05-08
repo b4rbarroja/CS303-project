@@ -1,5 +1,5 @@
 
-const MY_IP_ADDRESS = '192.168.1.5'; // Ensure this matches the IP in axios.js
+const MY_IP_ADDRESS = '192.168.1.25'; // Ensure this matches the IP in axios.js
 
 const ENV = {
   dev: {
@@ -11,22 +11,16 @@ const ENV = {
     timeout: 15000,
   },
   prod: {
-    apiUrl: 'https://api.scilibrary.com',
+    apiUrl: 'https://scilibrary-production.up.railway.app',
     timeout: 15000,
   },
 };
 
 // Determine current environment
 const getEnvVars = () => {
-  const isDev = __DEV__ !== false || process.env.NODE_ENV !== 'production';
-  
-  console.log('[Config] Environment:', isDev ? 'DEVELOPMENT' : 'PRODUCTION');
-  console.log('[Config] API URL:', isDev ? ENV.dev.apiUrl : ENV.prod.apiUrl);
-  
-  if (isDev || !__DEV__) {
+  if (__DEV__) {
     return ENV.dev;
   }
-  
   return ENV.prod;
 };
 
