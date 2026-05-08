@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SciLibrary",
-    "slug": "SciLibrary",
+    "slug": "scilibrary",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,6 +29,12 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "64d8bfae-ad4c-44e1-830e-3ef01917d916"
+      }
+    },
+    "owner": "scilibrary"
   }
 }
