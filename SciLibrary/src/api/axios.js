@@ -2,10 +2,10 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-// ⚠️  Change this to your machine's local IP before running on a physical device
-const MY_IP_ADDRESS = '192.168.1.5';
+//  Change this to your machine's local IP before running on a physical device
+const MY_IP_ADDRESS = '192.168.1.25';
 
-const baseURL = __DEV__ ? `http://${MY_IP_ADDRESS}:5000` : 'https://api.your-production-domain.com';
+const baseURL = __DEV__ ? `http://${MY_IP_ADDRESS}:5000` : 'https://scilibrary-production.up.railway.app';
 
 const API = axios.create({
   baseURL,
