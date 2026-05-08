@@ -1,25 +1,21 @@
 // utils/sendEmail.js
+import sgMail from '@sendgrid/mail';
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 export const sendEmail = async ({ email, subject, message }) => {
-  const BREVO_API_KEY = process.env.BREVO_API_KEY;
-  const FROM_EMAIL = process.env.BREVO_FROM_EMAIL;
+  const msg = {
+    to: email,
+    from: process.env.SENDGRID_FROM_EMAIL, // "E-Library <nerdodredo@gmail.com>" also works
+    subject,
+    html: message,
+  };
 
-  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'api-key': BREVO_API_KEY,
-    },
-    body: JSON.stringify({
-      sender: { email: FROM_EMAIL },
-      to: [{ email }],
-      subject,
-      htmlContent: message,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    console.error('Brevo API error:', error);
-    throw new Error(`Email sending failed: ${JSON.stringify(error)}`);
+  try {
+    await sgMail.send(msg);
+    console.log('Email sent via SendGrid');
+  } catch (error) {
+    console.error('SendGrid error:', error.response?.body || error);
+    throw error;
   }
 };
