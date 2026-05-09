@@ -219,7 +219,7 @@ export const markOverdueBooks = async () => {
 
 export const initializeOverdueCron = () => {
   try {
-    const job = cron.schedule("*/1 * * * *", async () => {
+    const job = cron.schedule("*/120 * * * *", async () => {
       console.log("\n[Overdue Cron] Scheduled task triggered");
       await markOverdueBooks();
     });
