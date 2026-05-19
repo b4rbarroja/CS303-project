@@ -24,7 +24,7 @@ TavilySearchAI api <br>
 # Project Overview
 
 
-This repository contains a Library Management System designed to streamline library operations for both administrators and members. The system automates the core processes of managing book inventories, tracking user borrowing activities, enforcing library policies, and community contributions.
+This repository contains a Library Management System designed to streamline library operations for both Librarians and Readers. The system automates the core processes of managing book inventories, tracking user borrowing activities, enforcing library policies, and community contributions.
 
 ## Key Features
 
